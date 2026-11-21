@@ -486,5 +486,45 @@
 - Checkpoint 0: новых источников нет. Нумерация продолжится с O44; последний ID перед работой — O43 (проверено по blob c8875a3).
 - Лимит HANDOFF: не более пяти новых источников для D7.
 - CP1: новых источников нет. Таблица D7.A опирается на текст GPT (0cc3eb8) и на уже проверенный O32 (виды параметров OpenFX XY и XYAbsolute), повторно источник не открывался.
+- Промежуточный checkpoint (PROGRESS v9.3): добавлены O44–O46. Израсходовано 3 из 5; в запасе O47–O48 — только для спорного пункта. По Blender актуальных данных нет, см. ниже.
 
-<!-- EOF OPUS_SOURCES (O01–O43; раздел 13 IN PROGRESS) -->
+### O44. OpenUSD: роли типов значений Sdf
+Статус: **Новое**. Источники:
+- https://openusd.org/docs/api/_usd__page__datatypes.html (дев-версия: https://openusd.org/dev/api/_usd__page__datatypes.html)
+- https://openusd.org/25.11/api/usd_2sdf_2types_8h_source.html
+- https://github.com/PixarAnimationStudios/OpenUSD/blob/release/pxr/usd/sdf/schema.cpp
+
+- [Ф] «Value types may also be specified by one of a set of special type names. These names correspond to the basic data types listed above but provide extra semantics about how the data should be interpreted.»
+- [Ф] Таблица ролей: point3d/point3f/point3h — Vec3 с ролью Point, «transform as a position»; normal3* — роль Normal, «transform as a normal»; vector3* — роль Vector, «transform as a direction».
+- [Ф] Токены ролей SDF_VALUE_ROLE_NAME_TOKENS: Point, Normal, Vector, Color, Frame и другие. В schema.cpp есть также роль TextureCoordinate.
+- [Ф] schema.cpp: point3f и vector3f объявлены с DefaultUnit(length) и Role(point) или Role(vector). Роль и единица задаются поверх одного хранения.
+- [Ф] Базовый float2 (GfVec2f, «vector of 2 floats») роли не несёт.
+- [?] Строку texCoord2f в выдержке не видел.
+
+### O45. Houdini 22.0, VEX: метаданные типа атрибута
+Статус: **Новое**. Источники:
+- https://www.sidefx.com/docs/houdini/vex/attribtypeinfo_suite.html
+- https://www.sidefx.com/docs/houdini/vex/functions/setattribtypeinfo.html
+
+- [Ф] «Houdini's geometry attributes have a bit of metadata specifying whether the data in the attribute represents some kind of transformation (for example, a position or rotation), and if so, whether/how it should be modified when the geometry itself is transformed.»
+- [Ф] Значения: "point" — «Apply scales, rotations, and transformations»; "vector" — «Apply scales and rotations, but not transformations»; "normal" — «Apply rotations, apply scales with inverse-transpose»; "color" — «Don't transform»; "texturecoord" — «Don't transform, and try to preserve seams when interpolating»; "none" — «Don't transform».
+- [Ф] Тот же текст есть в документации 20.0 и 20.5.
+- [О] Это метаданные поверх общего float-хранения. Они управляют трансформацией, но арифметику не запрещают.
+
+### O46. Rust euclid 0.22.14: типизированные точки, векторы и размеры
+Статус: **Новое**. Источники:
+- https://docs.rs/euclid/latest/euclid/ (крейт 0.22.14)
+- https://docs.rs/euclid/0.22.14/euclid/struct.Point2D.html, а также страницы Vector2D и Size2D
+
+- [Ф] «A collection of strongly typed math tools for computer graphics with an inclination towards 2d graphics and layout. All types are generic over the scalar type… and tagged with a generic Unit parameter which is useful to prevent mixing values from different spaces. For example it should not be legal to translate a screen-space position by a world-space vector…»
+- [Ф] Тег по умолчанию — UnknownUnit; есть from_untyped и to_untyped.
+- [Ф] Отдельные структуры: «A 2d Point tagged with a unit», «A 2d Vector tagged with a unit», «A 2d size tagged with a unit».
+- [Ф] Point2D реализует Sub<Vector2D> и Sub<Size2D>: точка минус размер даёт точку. Это прагматичное послабление.
+- [Ф] Vector2D::to_point («Cast this vector into a point. Equivalent to adding this vector to the origin»), Size2D::to_vector, Vector2D::extend(z) → Vector3D.
+- [?] Что Point + Point не реализовано, в выдержке явно не подтверждено.
+
+### Не удалось подтвердить в сессии 9
+- Текущую размерность и подтипы сокета Vector в Blender. Поиск нашёл только устаревшие API: 2.64 — NodeSocketVectorXYZ с подтипами VECTOR_NONE, VECTOR_TRANSLATION, VECTOR_DIRECTION, VECTOR_VELOCITY, VECTOR_ACCELERATION, VECTOR_EULER, VECTOR_XYZ (http://www.blender.org/documentation/blender_python_api_2_64_release/bpy.types.NodeSocketVectorXYZ.html); 2.93 — NodeSocketVector, «3D vector socket of a node» (https://docs.blender.org/api/2.93/bpy.types.NodeSocketVector.html). Задача руководства https://projects.blender.org/blender/blender-manual/issues/105379 упоминает «Attributes: Add 4D float vector type». Страница текущего API https://docs.blender.org/api/current/bpy.types.NodeTreeInterfaceSocketVector.html не загрузилась, повторно не запрашивал. Как источник в реестр не вношу.
+- Строку texCoord2f в таблице OpenUSD (O44) и отсутствие Point + Point в euclid (O46).
+
+<!-- EOF OPUS_SOURCES (O01–O46; раздел 13 IN PROGRESS) -->
