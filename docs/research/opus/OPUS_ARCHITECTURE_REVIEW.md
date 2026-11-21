@@ -4,7 +4,7 @@
 - Предмет: PR #1, head 0cc3eb8, ветка `research/gpt-architecture-2026-11-21`. В первую очередь `docs/research/gpt/ARCHITECTURE_PROPOSAL.md`, а также TECHNOLOGY_COMPARISON, OPEN_QUESTIONS, RISK_REGISTER, EXPERIMENT_PLAN, DEVELOPMENT_ROADMAP и OPUS_REVIEW_BRIEF.
 - Точка отсчёта: снимок `00_PRE_GPT_POSITION.md` (позиции T1–T15), закоммиченный до чтения PR #1 (9f2dd32). Источники: `OPUS_SOURCES.md` (O01–O43, проверены 2026-11-21) и реестр GPT `SOURCES.md` (S01–S21).
 - Статус: рецензия, а не решение. Стек не утверждается. Ничего не собиралось и не запускалось. Все оценки производительности — арифметика или экспертные оценки, а не измерения.
-- Готовые разделы: 0–2; 3 (D1–D6).
+- Готовые разделы: 0–2; 3 (D1–D6). D7 — IN PROGRESS (сессия 9).
 - Документ пишется по разделам, каждый раздел — отдельным коммитом. Внизу файла стоит маркер конца; если его нет, файл усечён.
 - Детали вынесены в OPUS_COMPUTE_CORE.md, OPUS_DATA_MODEL.md, OPUS_NODE_GRAPH.md, OPUS_TECHNOLOGY_RESEARCH.md, OPUS_RISK_ANALYSIS.md, OPUS_ROADMAP_REVIEW.md и OPUS_FINAL_REPORT.md (план — в PROGRESS.md). Здесь — сводные архитектурные выводы.
 
@@ -490,4 +490,10 @@ Field параметризуется доменом:
   - egui и Slint не проходят P3 — A-min теряет UI-основу; рассматриваются Qt через C ABI или гибрид.
   - Владелец требует уже в первой версии цветовой менеджмент уровня OCIO, USD или VDB — C++ FFI переходит в v1, и A-min сводится к A.
 
-<!-- EOF OPUS_ARCHITECTURE_REVIEW (разделы 0–2, 3:D1–D6) -->
+### D7. Vector2D и семантика двумерных величин — IN PROGRESS
+
+- Статус: IN PROGRESS, сессия 9, checkpoint 0 (2026-11-21). Текст находки ещё не написан; заготовка будет заменена на CP1–CP3.
+- Задача (HANDOFF D7): семантика 2D-величин и допустимые операции; сравнение пяти вариантов представления; последствия для Vector3D и Field2D; система координат Field2D; рекомендация [PROP].
+- Исходные пункты: PROGRESS v9 — «Вектор 2D отложен до G6 при требовании R06»; D5 — смещения и размеры являются величинами Length/Position; OPEN — нормировка домена Field2D (D1, D5).
+
+<!-- EOF OPUS_ARCHITECTURE_REVIEW (разделы 0–2, 3:D1–D6, D7 IN PROGRESS) -->
