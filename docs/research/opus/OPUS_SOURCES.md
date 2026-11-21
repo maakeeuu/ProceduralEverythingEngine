@@ -1,6 +1,6 @@
 # OPUS_SOURCES — реестр проверенных источников
 
-- Версия: v1. Дата проверки всех записей: 2026-11-21 (сессия 2).
+- Версия: v2. O01–O24 проверены 2026-11-21 (сессия 2); O25–O31 — 2026-11-21 (сессия 6, раздел 10). Маркер конца файла добавлен в v2; в v1 (blob 0122bf6) его не было.
 - Ветка: `research/opus-review-continuation-2026-11-21`.
 - Назначение: проверить изменчивые факты (версии, статусы стандартов, лицензии), на которые опираются исследование GPT (PR #1) и снимок `00_PRE_GPT_POSITION.md`. Попутно закрыть часть пробелов, которые GPT сам перечислил в разделе «Неустановленное и отложенное» своего реестра.
 
@@ -261,3 +261,74 @@
 - QS5. Дата релиза MaterialX 1.39.5 и лицензия по файлу LICENSE.
 - QS6. Год conformance KosmicKrisp в посте LunarG (2025 или 2026).
 - QS7. Синхронность egui-wgpu и egui 0.37 (changelog против docs.rs).
+
+## 10. Источники для D4 (сессия 6, проверка 2026-11-21)
+
+- Метод тот же, что в разделе 0: web-поиск и загрузка страниц первоисточников. Ничего не собиралось и не запускалось.
+- O29 дополняет O15, не заменяя его.
+
+### O25. OpenFX: регион интереса
+Статус: **Новое**. Источники:
+- https://openfx.readthedocs.io/en/latest/Reference/api/file/ofxImageEffect_8h.html (документация OpenFX 1.5.1)
+- https://openfx.readthedocs.io/en/latest/Reference/ofxProcessingArch.html
+- https://github.com/AcademySoftwareFoundation/openfx/blob/main/include/ofxImageEffect.h
+
+- [Ф] kOfxImageEffectActionGetRegionsOfInterest: «This action allows a host to ask an effect, given a region I want to render, what region do you need from each of your input clips. In that way, depending on the host architecture, a host can fetch the minimal amount of the image needed as input.» По умолчанию RoI равен запрошенному региону.
+- [Ф] Region of definition — «the rectangular section of the 2D image plane that it is capable of filling». Архитектура описана как бесконечная 2D-плоскость, на которой заполняются пиксели.
+- [О] Прецедент для D4: footprint объявляет нода, регион вычисляет хост.
+
+### O26. Halide (PLDI 2013)
+Статус: **Новое**. Источники:
+- J. Ragan-Kelley, C. Barnes, A. Adams, S. Paris, F. Durand, S. Amarasinghe. «Halide: A Language and Compiler for Optimizing Parallelism, Locality, and Recomputation in Image Processing Pipelines». PLDI 2013, DOI 10.1145/2491956.2462176. PDF: https://people.csail.mit.edu/jrk/halide-pldi13.pdf
+- Обзор: Communications of the ACM, январь 2018, https://cacm.acm.org/magazines/2018/1/223877-halide/fulltext
+
+- [Ф] Конвейеры состоят из «large graphs of different stencil stages, as well as complex reductions, and stages with global or data-dependent access patterns».
+- [Ф] Редукция задаётся начальной функцией и рекурсивной функцией редукции; «Unlike a pure function, the meaning of a reduction depends on the order in which the reduction function is applied».
+- [Ф] CACM 2018: язык «separates the algorithm from its schedule».
+- Не удалось подтвердить цитатой в этой сессии описание bounds inference. Выводы D4 на нём не строятся.
+- [О] Классы «стенсил / редукция / глобальный доступ» совпадают с классификацией D4.
+
+### O27. Параллельная редукция на GPU
+Статус: **Новое**. Источник: M. Harris, «Optimizing Parallel Reduction in CUDA», NVIDIA Developer Technology (слайды, дата не указана), https://developer.download.nvidia.com/assets/cuda/files/reduction.pdf
+
+- [Ф] «Tree-based approach used within each thread block»; «But how do we communicate partial results between thread blocks?»; раздел «Problem: Global Synchronization».
+- Не удалось подтвердить дословно продолжение слайда с решением (фрагмент обрезан). [О] Без глобальной синхронизации внутри одного запуска редукция требует нескольких проходов или атомарных операций.
+- [О] Документ про CUDA; перенос на WGSL/wgpu — аналогия, а не проверенный факт.
+
+### O28. Pearson, модель Gray–Scott
+Статус: **Подтверждено** библиографически (S17 GPT). Источники:
+- J. E. Pearson, «Complex Patterns in a Simple System», Science 261(5118), 189–192, 9 июля 1993, DOI 10.1126/science.261.5118.189
+- Препринт arXiv:patt-sol/9304003 (17.04.1993): https://arxiv.org/abs/patt-sol/9304003
+
+- [Ф] Аннотация: «Numerical simulations of a simple reaction--diffusion model reveal a surprising variety of irregular spatio--temporal patterns. These patterns arise in response to finite--amplitude perturbations.»
+- Полный текст в этой сессии не читался.
+
+### O29. OpenSubdiv: статическая топология (дополняет O15)
+Статус: **Новое**. Источники: https://graphics.pixar.com/opensubdiv/docs/intro.html, https://graphics.pixar.com/opensubdiv/docs/mod_notes.html (документация 3.7.0).
+
+- [Ф] «This code path is optimized for drawing deforming surfaces with static topology at interactive framerates.»
+- [Ф] Хорошие сетки для subdivision «consist primarily of regular faces (quads for Catmull-Clark, tris for Loop)».
+- [О] Быстрый путь рассчитан на статическую топологию; при её смене анализ повторяется. Для D4 смена топологии — отдельный класс нагрузки.
+- Документация показывает версию 3.7.0, а O15 фиксирует релиз 3.8.0; на выводы это не влияет.
+
+### O30. Blender: Full Frame Compositor (#88150)
+Статус: **Новое**. Источники:
+- https://projects.blender.org/blender/blender/issues/88150 (Manuel Castilla, 09.05.2021; задача закрыта)
+- https://archive.blender.org/developer/differential/0011/0011686/index.html (D11686, 2021)
+
+- [Ф] «Current compositor implementation is tile-based having the priority of displaying first tiles as quickly as possible. Memory usage can be very high for complex/long trees as buffers are kept from tree execution start to finish.»
+- [Ф] Цель: «convert current tiled/per-pixel implementation to full-frame»; «All nodes/operations are buffered, creating buffers on first read and freeing them as soon as all their readers have finished.»
+- [Ф] D11686: full-frame Mix node «2.3x faster than tiled fallback on average». Это замер разработчиков Blender, не наш.
+
+### O31. Blender 4.2 LTS: композитор
+Статус: **Новое**. Источник: https://developer.blender.org/docs/release_notes/4.2/compositor/
+
+- [Ф] «The render compositor CPU backend has also been rewritten to improve performance, often making it several times faster than before. There are some changes in behavior. These were made so that the final render and 3D viewport compositor work consistently, and can run efficiently on the GPU.»
+- [Ф] Композитинг финального рендера может выполняться на GPU; ожидается, что CPU и GPU дают одинаковый результат «with minimal differences between devices».
+- Не удалось подтвердить в этой сессии, что тайловый режим удалён именно в 4.2: в примечаниях к выпуску это не найдено.
+
+### Не удалось подтвердить в сессии 6
+- Перечень типов atomics в WGSL и наличие атомарного min/max для f32. Страница спецификации W3C (Candidate Recommendation Draft от 06.11.2026) загружена, но нужный фрагмент не извлечён.
+- Условие устойчивости явной схемы для диффузии. В D4 не используется; отложено до D8.
+
+<!-- EOF OPUS_SOURCES (O01–O31) -->
