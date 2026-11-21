@@ -1,6 +1,6 @@
 # OPUS_SOURCES — реестр проверенных источников
 
-- Версия: v2. O01–O24 проверены 2026-11-21 (сессия 2); O25–O31 — 2026-11-21 (сессия 6, раздел 10). Маркер конца файла добавлен в v2; в v1 (blob 0122bf6) его не было.
+- Версия: v3. O01–O24 проверены 2026-11-21 (сессия 2); O25–O31 — 2026-11-21 (сессия 6, раздел 10); O32–O38 — 2026-11-21 (сессия 7, раздел 11). Маркер конца файла добавлен в v2; в v1 (blob 0122bf6) его не было.
 - Ветка: `research/opus-review-continuation-2026-11-21`.
 - Назначение: проверить изменчивые факты (версии, статусы стандартов, лицензии), на которые опираются исследование GPT (PR #1) и снимок `00_PRE_GPT_POSITION.md`. Попутно закрыть часть пробелов, которые GPT сам перечислил в разделе «Неустановленное и отложенное» своего реестра.
 
@@ -331,4 +331,93 @@
 - Перечень типов atomics в WGSL и наличие атомарного min/max для f32. Страница спецификации W3C (Candidate Recommendation Draft от 06.11.2026) загружена, но нужный фрагмент не извлечён.
 - Условие устойчивости явной схемы для диффузии. В D4 не используется; отложено до D8.
 
-<!-- EOF OPUS_SOURCES (O01–O31) -->
+## 11. Источники для D5 (сессия 7, проверка 2026-11-21)
+
+- Метод тот же, что в разделе 0, но страницы целиком не загружались: цитаты взяты из выдержек web-поиска по первоисточникам. Ничего не собиралось и не запускалось.
+- O35 дополняет O22, O36 — O30–O31, O37 — O23.
+
+### O32. OpenFX: системы координат и пространственные параметры
+Статус: **Новое**. Источники (документация OpenFX 1.5.1, Academy Software Foundation; даты страниц не указаны):
+- https://openfx.readthedocs.io/en/latest/Reference/ofxCoordSystem.html
+- https://openfx.readthedocs.io/en/latest/Reference/ofxParameter.html
+- https://openfx.readthedocs.io/en/main/Reference/api/file/ofxParam_8h.html
+- https://openfx.readthedocs.io/en/main/Reference/api/file/ofxImageEffect_8h.html
+- https://openfx.readthedocs.io/en/latest/Guide/ofxExample5_Circle.html
+
+- [Ф] «OFX has three spatial coordinate systems»: Canonical («the idealised image plane»), Pixel («coordinates in addressable pixels») и Normalised Canonical («resolution independent description of parameters»).
+- [Ф] Canonical — «a coordinate system of square unscaled pixels»; «parameter values are expressed in them».
+- [Ф] Перевод в пиксели: X' = (X * SX)/PAR, Y' = Y * SY * FS, где SX и SY берутся из kOfxImageEffectPropRenderScale.
+- [Ф] Spatial-параметры: «The host and plug-in get and set values in this coordinate system. Scaling to Pixel Coordinate is the responsibility of the effect.» Типы: kOfxParamDoubleTypeX (размер), kOfxParamDoubleTypeXAbsolute (позиция), а также XY и XYAbsolute.
+- [Ф] «The original OFX API only specified normalised parameters, this proved to be somewhat more of a problem than expected. With the 1.2 version of the API, spatial parameters were introduced.» Нормализованная система «being deprecated».
+- [Ф] kOfxImageEffectPropRenderScale: «The proxy render scale currently being applied. This should be applied to any spatial parameters to position them correctly.»
+- [Ф] kOfxImageEffectPropThumbnailRender — необязательное свойство, «if the host considers this render a “thumbnail”».
+
+### O33. After Effects C++ SDK: downsample
+Статус: **Новое**. Источники:
+- https://ae-plugins.docsforadobe.dev/effect-basics/PF_InData
+- https://ae-plugins.docsforadobe.dev/effect-details/pixel-aspect-ratio
+- After Effects CC 2015 SDK Guide (Adobe), раздел PF_InData: та же формулировка в копии на scribd.com.
+
+- [Ф] downsample_x/y: «Effects need the downsampling factors to interpret scalar parameters representing pixel distances in the image (like sliders). For example, a blur of 4 pixels should be interpreted as a blur of 2 pixels if the downsample factor is 1/2 in each direction».
+- [Ф] «Point parameters are given to the effect scaled for downsample factor and pixel aspect ratio»; «any slider which defines a size in pixels will be a problem when the image is rendered downsampled».
+- Ограничение: docsforadobe — сайт сообщества, воспроизводящий SDK Guide. Текущий официальный PDF Adobe не открывался.
+
+### O34. Nuke: proxy mode
+Статус: **Новое**. Источники (Foundry Learn; текущая документация Nuke 17.x и Nuke 11.2):
+- https://learn.foundry.com/nuke/content/getting_started/managing_scripts/managing_scripts.html
+- https://learn.foundry.com/nuke/11.2/content/getting_started/managing_scripts/proxy_mode.html
+
+- [Ф] «In the full-size mode, images are read in exactly as they are on the disk, and all positions are in actual pixels in these images.»
+- [Ф] «In proxy mode, instead, a proxy scale factor is used. All images and all x/y positions are scaled by this factor. This produces the same (or at least very similar) composite at a different scale.»
+- [?] Как пересчитываются скалярные размеры (радиус Blur и подобные), в выдержках не сказано.
+
+### O35. Houdini Copernicus: Units у Blur и пространства
+Статус: **Новое**, дополняет O22. Источники (SideFX, документация Houdini 22.0 и 20.5):
+- https://www.sidefx.com/docs/houdini/nodes/cop/blur.html
+- https://www.sidefx.com/docs/houdini/copernicus/spaces.html
+- https://www.sidefx.com/docs/houdini20.5/nodes/cop2/blur.html (старая сеть COP2)
+
+- [Ф] Blur, Units: «Image (default) Sets the blur radius to use units of the Image Space»; «Pixels Sets the blur radius to use units of the number of pixels»; в 22.0 есть также Local.
+- [Ф] Пространства: Buffer, Pixel, Texture, Image, Local, World. Image «Maps from -1 through 1 across the display window, which scales the image to fit to preserve the pixel aspect ratio».
+- [Ф] «The preview thumbnail for a COP node displays the output in a -1 to 1 window.»
+- [Ф] «Copernicus values are in their natural space (a requirement for HDR) instead of being normalized.»
+- [Ф] COP2 Blur, Units: «UV Coords Values are expressed between 0 and 1 ... This is resolution independent.»; «Pixels The blur is expressed in pixels.»
+
+### O36. Blender: опция Relative у Blur в композиторе
+Статус: **Новое**, дополняет O30–O31. Источники:
+- https://docs.blender.org/manual/en/4.0/compositing/types/filter/blur/blur.html (обновлено 15.01.2024)
+- https://docs.blender.org/api/4.5/bpy.types.CompositorNodeBlur.html
+- https://docs.blender.org/manual/en/latest/compositing/types/filter/blur/blur.html (5.2 LTS, обновлено 26.10.2026)
+
+- [Ф] 4.0: «Relative Percentage Value of the blur radius relative to the image size»; «X, Y Values set the ellipsoid radius in numbers of pixels».
+- [Ф] API 4.5: use_relative «Use relative (percent) values to define blur radius. (Deprecated: Unused.)»; size_x «(Deprecated: Use Size input instead.)».
+- [Ф] В руководстве 5.2 LTS у Blur нет опции Relative.
+- [?] Единицы входа Size в 5.x и причина отказа от Relative не найдены.
+
+### O37. Substance 3D Designer: наследование разрешения
+Статус: **Новое**, дополняет O23. Источники (Adobe):
+- https://helpx.adobe.com/substance-3d-designer/substance-compositing-graphs/inheritance-in-substance-compositing-graphs.html (обновлено 26.02.2026)
+- https://helpx.adobe.com/substance-3d-designer/best-practices/performance-optimization-guidelines.html
+- https://helpx.adobe.com/substance-3d-designer/using/export.html
+
+- [Ф] Методы наследования: «Absolute», «Relative to input», «Relative to parent». Base parameters: «Output Size, Output Format (i.e., bitdepth), Pixel Size, Pixel Ratio, Tiling Mode, Random Seed».
+- [Ф] Рекомендация по производительности: Uniform Color ставить в «Absolute [16px x 16px]», а следующую ноду — в Relative to Parent.
+- [Ф] Предупреждение при публикации «Non-Relative to parent x1 output size parameter» означает, что «it won't be possible to generate textures from this package at a resolution of your choosing».
+- [?] Единицы Intensity у Blur HQ и смысл Pixel Size не проверены.
+
+### O38. Линдеберг: дискретное масштабное пространство
+Статус: **Новое**. Источники:
+- T. Lindeberg, «Scale-Space for Discrete Signals», IEEE TPAMI, vol. 12, no. 3, 1990, pp. 234–254, DOI 10.1109/34.49051: https://www.computer.org/csdl/journal/tp/1990/03/i0234/13rRUx0xPnO
+- T. Lindeberg, «Discrete approximations of Gaussian smoothing and Gaussian derivatives», arXiv:2311.11317v7, 13.05.2024: https://arxiv.org/pdf/2311.11317v7
+
+- [Ф] 1990: «Special attention is given to discretization effects, which occur when results from the continuous scale-space theory are to be implemented computationally.»
+- [Ф] 2024: дискретный аналог гауссиана «has the best theoretical properties»; «For scale values when the standard deviation of the continuous Gaussian kernel is above 0.75 or 1, the sampled Gaussian kernel does also have very good properties, and leads to very good approximations of the corresponding fully continuous results.»
+- [Ф] 2024: у нормированного дискретизированного гауссиана на малых масштабах дисперсия «substantially smaller» дисперсии непрерывного ядра.
+
+### Не удалось подтвердить в сессии 7
+- Единицы Size у Blur в Blender 5.x и причина отказа от Relative.
+- Единицы Intensity у Blur HQ и смысл Pixel Size в Substance 3D Designer.
+- Пересчёт скалярных размеров в proxy mode Nuke.
+- Текущая официальная версия After Effects SDK Guide: использованы сайт сообщества и текст 2015 года.
+
+<!-- EOF OPUS_SOURCES (O01–O38) -->
